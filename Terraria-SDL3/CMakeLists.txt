@@ -2,7 +2,7 @@
 
 project(Terraria)
 
-add_executable(Terraria src/main.cpp "src/texture.h" "src/texture.cpp" "src/terraria.h" )
+add_executable(Terraria src/main.cpp "src/texture.h" "src/texture.cpp" "src/terraria.h" "src/resourcemanager.h" "src/resourcemanager.cpp")
 
 target_link_libraries(Terraria
     PRIVATE 

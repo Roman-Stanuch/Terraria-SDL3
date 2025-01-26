@@ -2,12 +2,9 @@
 
 #include "SDL3/SDL_image.h"
 
-
-Terraria::Texture::Texture(const std::string& texturePath, SDL_Renderer* renderer) :
-	m_Texture(nullptr), m_Width(0), m_Height(0)
+Terraria::Texture::Texture(const char* texturePath, SDL_Renderer* renderer)
 {
-    std::string completePath = m_PathToTextures + texturePath;
-    m_Texture = IMG_LoadTexture(renderer, completePath.c_str());
+    m_Texture = IMG_LoadTexture(renderer, texturePath);
     if (m_Texture)
     {
         m_Width = m_Texture->w;
@@ -15,13 +12,14 @@ Terraria::Texture::Texture(const std::string& texturePath, SDL_Renderer* rendere
     }
     else
     {
-        SDL_Log("Could not load texture at path: %s", completePath.c_str());
+        SDL_Log("Could not load texture at path: %s", texturePath);
     }
 }
 
 Terraria::Texture::~Texture()
 {
-    Destroy();
+    SDL_DestroyTexture(m_Texture);
+    m_Texture = nullptr;
 }
 
 void Terraria::Texture::Render(float x, float y, SDL_Renderer* renderer)
@@ -34,12 +32,4 @@ void Terraria::Texture::Render(float x, float y, SDL_Renderer* renderer)
 
     SDL_FRect dstRect = { x, y, static_cast<float>(m_Width), static_cast<float>(m_Height) };
     SDL_RenderTexture(renderer, m_Texture, nullptr, &dstRect);
-}
-
-void Terraria::Texture::Destroy()
-{
-    SDL_DestroyTexture(m_Texture);
-    m_Texture = nullptr;
-    m_Width = 0;
-    m_Height = 0;
 }

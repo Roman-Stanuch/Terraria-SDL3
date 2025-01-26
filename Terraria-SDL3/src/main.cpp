@@ -1,5 +1,6 @@
 ﻿#include "texture.h"
 #include "terraria.h"
+#include "resourcemanager.h"
 
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_main.h"
@@ -57,7 +58,7 @@ int main(int argc, char* args[])
     }
     else
     {
-        auto texture = std::make_unique<Texture>("tiles/stone.png", renderer);
+        TexturePtr texture = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
 
         bool quit = false;
 
