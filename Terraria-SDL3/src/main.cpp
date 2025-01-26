@@ -1,21 +1,23 @@
-﻿
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
-#include <string>
+﻿#include "texture.h"
+#include "terraria.h"
 
-constexpr int kScreenWidth{ 640 };
-constexpr int kScreenHeight{ 480 };
+#include "SDL3/SDL.h"
+#include "SDL3/SDL_main.h"
 
-bool init();
-void close();
+const uint32_t screenWidth = 1920;
+const uint32_t screenHeight = 1080;
 
-SDL_Window* gWindow{ nullptr };
-SDL_Surface* gScreenSurface{ nullptr };
-SDL_Surface* gHelloWorld{ nullptr };
+bool Init();
+void Close();
 
-bool init()
+SDL_Window* window = nullptr;
+SDL_Renderer* renderer = nullptr;
+
+using namespace Terraria;
+
+bool Init()
 {
-    bool success{ true };
+    bool success = true;
 
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -24,45 +26,40 @@ bool init()
     }
     else
     {
-        gWindow = SDL_CreateWindow("SDL3 Tutorial: Hello SDL3", kScreenWidth, kScreenHeight, 0);
-        if (gWindow == nullptr)
+        if (!SDL_CreateWindowAndRenderer("Terraria in SDL3", screenWidth, screenHeight, 0, &window, &renderer))
         {
             SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
             success = false;
-        }
-        else
-        {
-            gScreenSurface = SDL_GetWindowSurface(gWindow);
         }
     }
 
     return success;
 }
 
-void close()
+void Close()
 {
-    SDL_DestroySurface(gHelloWorld);
-    gHelloWorld = nullptr;
-
-    SDL_DestroyWindow(gWindow);
-    gWindow = nullptr;
-    gScreenSurface = nullptr;
+    SDL_DestroyRenderer(renderer);
+    renderer = nullptr;
+    SDL_DestroyWindow(window);
+    window = nullptr;
 
     SDL_Quit();
 }
 
 int main(int argc, char* args[])
 {
-    int exitCode{ 0 };
+    int exitCode = 0;
 
-    if (!init())
+    if (!Init())
     {
         SDL_Log("Unable to initialize program!\n");
         exitCode = 1;
     }
     else
     {
-        bool quit{ false };
+        auto texture = std::make_unique<Texture>("tiles/stone.png", renderer);
+
+        bool quit = false;
 
         SDL_Event e;
         SDL_zero(e);
@@ -75,22 +72,18 @@ int main(int argc, char* args[])
                 {
                     quit = true;
                 }
-                if (e.key.key == SDLK_E)
-                {
-                    quit = true;
-                }
             }
 
-            //Fill the surface white
-            SDL_FillSurfaceRect(gScreenSurface, nullptr, SDL_MapSurfaceRGB(gScreenSurface, 0xFF, 0xFF, 0xFF));
-            //Render image on screen
-            SDL_BlitSurface(gHelloWorld, nullptr, gScreenSurface, nullptr);
-            //Update the surface
-            SDL_UpdateWindowSurface(gWindow);
+            SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+            SDL_RenderClear(renderer);
+
+            texture->Render(0.f, 0.f, renderer);
+
+            SDL_RenderPresent(renderer);
         }
     }
 
-    close();
+    Close();
 
     return exitCode;
 }
