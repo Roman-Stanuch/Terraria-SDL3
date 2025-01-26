@@ -1,5 +1,6 @@
 #include "resourcemanager.h"
-#include "texture.h"
+
+#include "SDL3/SDL_image.h"
 
 #include <iostream>
 
@@ -11,15 +12,26 @@ namespace Terraria
 		return instance;
 	}
 
-	TexturePtr ResourceManager::LoadTexture(const char* name, const char* path, SDL_Renderer* renderer)
+	SDL_Texture* ResourceManager::LoadTexture(const char* name, const char* path, SDL_Renderer* renderer)
 	{
 		// Return the texture if already loaded
 		if (m_TextureMap.find(name) != m_TextureMap.end())
+		{
 			return m_TextureMap[name];
+		}
 
 		std::string completePath(m_PathToTextures);
 		completePath += path;
-		m_TextureMap[name] = std::make_shared<Texture>(completePath.c_str(), renderer);
+		m_TextureMap.insert({name, IMG_LoadTexture(renderer, completePath.c_str())});
 		return m_TextureMap[name];
+	}
+
+	void ResourceManager::Deinit()
+	{
+		for (auto& row : m_TextureMap)
+		{
+			SDL_DestroyTexture(row.second);
+		}
+		m_TextureMap.clear();
 	}
 }

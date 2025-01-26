@@ -1,5 +1,4 @@
-﻿#include "texture.h"
-#include "terraria.h"
+﻿#include "terraria.h"
 #include "resourcemanager.h"
 
 #include "SDL3/SDL.h"
@@ -18,27 +17,26 @@ using namespace Terraria;
 
 bool Init()
 {
-    bool success = true;
-
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
         SDL_Log("SDL could not initialize! SDL error: %s\n", SDL_GetError());
-        success = false;
+        return false;
     }
-    else
+    
+    if (!SDL_CreateWindowAndRenderer("Terraria in SDL3", screenWidth, screenHeight, 0, &window, &renderer))
     {
-        if (!SDL_CreateWindowAndRenderer("Terraria in SDL3", screenWidth, screenHeight, 0, &window, &renderer))
-        {
-            SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
-            success = false;
-        }
+        SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
+        return false;
     }
 
-    return success;
+    SDL_SetRenderVSync(renderer, 1);
+
+    return true;
 }
 
 void Close()
 {
+    ResourceManager::Instance().Deinit();
     SDL_DestroyRenderer(renderer);
     renderer = nullptr;
     SDL_DestroyWindow(window);
@@ -58,7 +56,8 @@ int main(int argc, char* args[])
     }
     else
     {
-        TexturePtr texture = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
+        auto texture = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
+        auto texture2 = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
 
         bool quit = false;
 
@@ -78,7 +77,8 @@ int main(int argc, char* args[])
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(renderer);
 
-            texture->Render(0.f, 0.f, renderer);
+            SDL_FRect dstRect = { 0, 0, texture->w, texture->h };
+            SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
 
             SDL_RenderPresent(renderer);
         }

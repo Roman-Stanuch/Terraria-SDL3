@@ -2,29 +2,32 @@
 
 #include "terraria.h"
 
-#include <map>
+#include <unordered_map>
 
+struct SDL_Texture;
 struct SDL_Renderer;
 
 namespace Terraria
 {
-	class Texture;
-
-	typedef std::shared_ptr<Texture> TexturePtr;
-
 	class ResourceManager
 	{
 	public:
+		SDL_Texture* LoadTexture(const char* name, const char* path, SDL_Renderer* renderer);
+		void Deinit();
+
+		// Singleton
 		static ResourceManager& Instance();
-		TexturePtr LoadTexture(const char* name, const char* path, SDL_Renderer* renderer);
+		ResourceManager(const ResourceManager& obj) = delete;
+		void operator=(const ResourceManager&) = delete;
 
 	private:
 		const char* m_PathToTextures = "../../../res/textures/";
-		std::map<const char*, TexturePtr> m_TextureMap;
+		std::unordered_map<std::string, SDL_Texture*> m_TextureMap;
 
-		ResourceManager() {};
+		ResourceManager() {}
 
 	public:
 		void SetTexturePath(const char* path) { m_PathToTextures = path; }
+
 	};
 }
