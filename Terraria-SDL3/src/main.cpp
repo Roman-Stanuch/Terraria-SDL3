@@ -1,5 +1,6 @@
 ﻿#include "terraria.h"
 #include "resourcemanager.h"
+#include "world.h"
 
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_main.h"
@@ -56,13 +57,12 @@ int main(int argc, char* args[])
     }
     else
     {
-        auto texture = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
-        auto texture2 = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
-
         bool quit = false;
 
         SDL_Event e;
         SDL_zero(e);
+
+        auto world = std::make_unique<World>(16, 32, 32, 32);
 
         while (quit == false)
         {
@@ -77,8 +77,7 @@ int main(int argc, char* args[])
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(renderer);
 
-            SDL_FRect dstRect = { 0, 0, texture->w, texture->h };
-            SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
+            world->Render(renderer);
 
             SDL_RenderPresent(renderer);
         }
