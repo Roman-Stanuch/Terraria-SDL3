@@ -1,6 +1,7 @@
 ﻿#include "terraria.h"
 #include "resourcemanager.h"
-#include "world.h"
+#include "world/world.h"
+#include "entity/character.h"
 
 #include "SDL3/SDL.h"
 #define SDL_MAIN_USE_CALLBACKS
@@ -9,17 +10,19 @@
 const uint32_t screenWidth = 1920;
 const uint32_t screenHeight = 1080;
 const bool fullscreen = false;
+const uint32_t characterYOffset = 200;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 std::unique_ptr<Terraria::World> world = nullptr;
+std::unique_ptr<Terraria::Character> character = nullptr;
 
-double deltaTime = 0.f;
-double timeLastFrame = 0.f;
+float deltaTime = 0.f;
+float timeLastFrame = 0.f;
 
-float cameraX = 0.f;
-float cameraY = 0.f;
-float cameraSpeed = 100.f;
+void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr);
+void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr);
+void CalculateDeltaTime(float& dt);
 
 using namespace Terraria;
 
@@ -40,7 +43,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
     SDL_SetWindowFullscreen(window, fullscreen);
     SDL_SetRenderVSync(renderer, 1);
 
-    world = std::make_unique<World>(700, 500, 32, 32);
+    InitializeWorld(world);
+    InitializeCharacter(character);
 
     return SDL_AppResult::SDL_APP_CONTINUE;
 }
@@ -48,45 +52,28 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
     if (event->type == SDL_EVENT_QUIT)
-    {
         return SDL_APP_SUCCESS;
-    }
-    else if (event->type == SDL_EVENT_KEY_DOWN)
-    {
-        if (event->key.key == SDLK_UP)
-        {
-            cameraY -= cameraSpeed * (float)deltaTime;
-        }
-        if (event->key.key == SDLK_DOWN)
-        {
-            cameraY += cameraSpeed * (float)deltaTime;
-        }
-        if (event->key.key == SDLK_LEFT)
-        {
-            cameraX -= cameraSpeed * (float)deltaTime;
-        }
-        if (event->key.key == SDLK_RIGHT)
-        {
-            cameraX += cameraSpeed * (float)deltaTime;
-        }
-
-        if (cameraX < 0.f) cameraX = 0.f;
-        if (cameraY < 0.f) cameraY = 0.f;
-    }
 
     return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-    float timeThisFrame = (float)SDL_GetTicks();
-    deltaTime = (timeThisFrame - timeLastFrame) * 0.01;
-    timeLastFrame = timeThisFrame;
+    // Update world
+    CalculateDeltaTime(deltaTime);
+    character->Update(deltaTime);
 
+    // Prepare rendering
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
-    world->Render(renderer, cameraX, cameraY);
+    float characterPosX;
+    float characterPosY;
+    character->GetPosition(characterPosX, characterPosY);
+
+    // Perform rendering
+    world->Render(renderer, characterPosX, characterPosY);
+    character->Render(renderer);
 
     SDL_RenderPresent(renderer);
 
@@ -100,4 +87,24 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result)
     renderer = nullptr;
     SDL_DestroyWindow(window);
     window = nullptr;
+}
+
+void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr)
+{
+    int screenWidth = 0;
+    int screenHeight = 0;
+    SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
+    characterPtr = std::make_unique<Character>((float)screenWidth * 0.5f, ((float)screenHeight * 0.5f) + characterYOffset, renderer);
+}
+
+void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr)
+{
+    worldPtr = std::make_unique<World>(6400, 1800, 32, 32);
+}
+
+void CalculateDeltaTime(float& dt)
+{
+    float timeThisFrame = (float)SDL_GetTicks();
+    dt = (timeThisFrame - timeLastFrame) * 0.01f;
+    timeLastFrame = timeThisFrame;
 }

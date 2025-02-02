@@ -29,14 +29,33 @@ namespace Terraria
 		int maxRow = cameraRow + m_OverDraw + (screenHeight / m_TileHeight);
 		int maxColumn = cameraColumn + m_OverDraw + (screenWidth / m_TileWidth);
 
-		auto texture = ResourceManager::Instance().LoadTexture("stone", "tiles/stone.png", renderer);
+		SDL_Texture* texture = nullptr;
 
 		for (int row = cameraRow; row < maxRow && row < m_WorldData.size(); row++)
 		{
 			for (int column = cameraColumn; column < maxColumn && column < m_WorldData[row].size(); column++)
 			{
-				SDL_FRect dstRect = { column * (float)m_TileWidth - cameraPosX, row * (float)m_TileHeight - cameraPosY, (float)m_TileWidth, (float)m_TileHeight };
-				SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
+				switch (m_WorldData[row][column])
+				{
+				case 0:
+					texture = ResourceManager::Instance().LoadTexture("stone", "tile/stone.png", renderer);
+					break;
+				case 1:
+					texture = ResourceManager::Instance().LoadTexture("ice_stone", "tile/ice_stone.png", renderer);
+					break;
+				default:
+					texture = nullptr;
+				}
+
+				if (texture != nullptr)
+				{
+					SDL_FRect dstRect = { column * (float)m_TileWidth - cameraPosX, row * (float)m_TileHeight - cameraPosY, (float)m_TileWidth, (float)m_TileHeight };
+					SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
+				}
+				else
+				{
+					SDL_Log("Could not find valid texture for tile at Row: %i | Column: %i", row, column);
+				}
 			}
 		}
 	}

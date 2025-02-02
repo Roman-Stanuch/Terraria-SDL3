@@ -12,21 +12,22 @@ namespace Terraria
 	class ResourceManager
 	{
 	public:
+		ResourceManager(const ResourceManager& obj) = delete;
+		void operator=(const ResourceManager&) = delete;
+		static ResourceManager& Instance();
+
+		// Loads a texture from the given path. If a texture for "name" has already been loaded, it will be returned instead.
 		SDL_Texture* LoadTexture(const char* name, const char* path, SDL_Renderer* renderer);
 		void Deinit();
 
-		// Singleton
-		static ResourceManager& Instance();
-		ResourceManager(const ResourceManager& obj) = delete;
-		void operator=(const ResourceManager&) = delete;
-
 	private:
+		ResourceManager() {}
+
 		const char* m_PathToTextures = "../../../res/textures/";
 		std::unordered_map<std::string, SDL_Texture*> m_TextureMap;
 
-		ResourceManager() {}
-
 	public:
+		// Sets the root directory for searching for textures.
 		void SetTexturePath(const char* path) { m_PathToTextures = path; }
 
 	};
