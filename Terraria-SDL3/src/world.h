@@ -16,6 +16,8 @@ namespace Terraria
 		void Render(SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f);
 
 	private:
+		const uint32_t m_OverDraw = 2;
+
 		uint32_t m_WorldWidth = 32;
 		uint32_t m_WorldHeight = 32;
 		uint32_t m_TileWidth = 16;
