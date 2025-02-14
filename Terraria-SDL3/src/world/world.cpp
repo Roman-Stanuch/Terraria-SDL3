@@ -5,15 +5,34 @@
 #include "SDL3/SDL_render.h"
 
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 namespace Terraria
 {
-	World::World(uint32_t worldWidth, uint32_t worldHeight, uint32_t tileWidth, uint32_t tileHeight) :
-		m_WorldWidth(worldWidth), m_WorldHeight(worldHeight), m_TileWidth(tileWidth), m_TileHeight(tileHeight)
+	World::World(std::string worldName, uint32_t tileWidth, uint32_t tileHeight, std::string worldFolderPath) :
+		m_TileWidth(tileWidth), m_TileHeight(tileHeight)
 	{
-		for (int row = 0; row < (int)m_WorldHeight; row++)
+		std::ifstream worldStream(worldFolderPath + worldName);
+		if (worldStream)
 		{
-			m_WorldData.push_back(std::vector<uint32_t>(m_WorldWidth, 0));
+			std::string rowData;
+			uint32_t currentTile;
+
+			while (std::getline(worldStream, rowData))
+			{
+				std::istringstream sstream(rowData);
+				std::vector<uint32_t> constructedRow;
+				while (sstream >> currentTile)
+				{
+					constructedRow.push_back(currentTile);
+				}
+				m_WorldData.push_back(constructedRow);
+			}
+		}
+		else
+		{
+			SDL_Log("Could not load world");
 		}
 	}
 

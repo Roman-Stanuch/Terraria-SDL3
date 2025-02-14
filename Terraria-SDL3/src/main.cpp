@@ -99,7 +99,7 @@ void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr)
 
 void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr)
 {
-    worldPtr = std::make_unique<World>(6400, 1800, 32, 32);
+    worldPtr = std::make_unique<World>("world.txt", 32, 32);
 }
 
 void CalculateDeltaTime(float& dt)
