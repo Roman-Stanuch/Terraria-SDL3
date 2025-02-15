@@ -15,6 +15,8 @@ namespace Terraria
 		
 		virtual void Render(SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f) override;
 
+		void SetTile(const uint32_t x, const uint32_t y, const uint32_t tileID);
+
 	private:
 		const uint32_t m_OverDraw = 2; // Draws beyond to edge of the screen to ensure enough tiles are drawn.
 
@@ -26,6 +28,8 @@ namespace Terraria
 	public:
 		uint32_t GetWorldHeight() const { return (uint32_t)m_WorldData.size(); }
 		uint32_t GetWorldWidth() const { return (m_WorldData.size() > 0) ? (uint32_t)m_WorldData[0].size() : 0; }
+		uint32_t GetWorldTileHeight() const { return m_TileHeight; }
+		uint32_t GetWorldTileWidth() const { return m_TileWidth; }
 
 	};
 }

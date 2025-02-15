@@ -56,10 +56,13 @@ namespace Terraria
 			{
 				switch (m_WorldData[row][column])
 				{
-				case 0:
-					texture = ResourceManager::Instance().LoadTexture("stone", "tile/stone.png", renderer);
+				case 0: // No block
+					continue;
 					break;
 				case 1:
+					texture = ResourceManager::Instance().LoadTexture("stone", "tile/stone.png", renderer);
+					break;
+				case 2:
 					texture = ResourceManager::Instance().LoadTexture("ice_stone", "tile/ice_stone.png", renderer);
 					break;
 				default:
@@ -76,6 +79,14 @@ namespace Terraria
 					SDL_Log("Could not find valid texture for tile at Row: %i | Column: %i", row, column);
 				}
 			}
+		}
+	}
+
+	void World::SetTile(const uint32_t x, const uint32_t y, const uint32_t tileID)
+	{
+		if (x < GetWorldWidth() && y < GetWorldHeight())
+		{
+			m_WorldData[y][x] = tileID;
 		}
 	}
 }

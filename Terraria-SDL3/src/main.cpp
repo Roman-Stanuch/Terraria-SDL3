@@ -10,7 +10,7 @@
 const uint32_t screenWidth = 1920;
 const uint32_t screenHeight = 1080;
 const bool fullscreen = false;
-const uint32_t characterYOffset = 200;
+const uint32_t characterYOffset = 100;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -61,10 +61,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 {
     // Update world
     CalculateDeltaTime(deltaTime);
-    character->Update(deltaTime);
+    character->Update(deltaTime, *world);
 
     // Prepare rendering
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x65, 0xB7, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
     float characterPosX;
