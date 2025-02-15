@@ -2,7 +2,7 @@
 
 project(Terraria)
 
-add_executable(Terraria src/main.cpp "src/terraria.h" "src/resourcemanager.h" "src/resourcemanager.cpp" "src/world/world.h" "src/world/world.cpp" "src/entity/character.h" "src/entity/character.cpp" "src/render/renderable.h" "src/entity/entity.h" "src/helper/conversion.h" "src/helper/conversion.cpp")
+add_executable(Terraria src/main.cpp "src/terraria.h" "src/resourcemanager.h" "src/resourcemanager.cpp" "src/world/world.h" "src/world/world.cpp" "src/entity/character.h" "src/entity/character.cpp" "src/render/renderable.h" "src/entity/entity.h" "src/helper/conversion.h" "src/helper/conversion.cpp"  )
 
 target_link_libraries(Terraria
     PRIVATE 

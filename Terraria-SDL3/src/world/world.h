@@ -17,6 +17,8 @@ namespace Terraria
 
 		void SetTile(const uint32_t x, const uint32_t y, const uint32_t tileID);
 
+		void SaveWorld(std::string worldName, std::string worldFolderPath = "../../../res/worlds/");
+
 	private:
 		const uint32_t m_OverDraw = 2; // Draws beyond to edge of the screen to ensure enough tiles are drawn.
 

@@ -89,4 +89,25 @@ namespace Terraria
 			m_WorldData[y][x] = tileID;
 		}
 	}
+
+	void World::SaveWorld(std::string worldName, std::string worldFolderPath)
+	{
+		std::ofstream worldStream(worldFolderPath + worldName);
+		if (worldStream)
+		{
+			for (int row = 0; row < GetWorldHeight(); row++)
+			{
+				for (int column = 0; column < GetWorldWidth(); column++)
+				{
+					const char* separator = (column == m_WorldData[row].size() - 1) ? "\n" : " ";
+					worldStream << m_WorldData[row][column] << separator;
+				}
+			}
+			worldStream.close();
+		}
+		else
+		{
+			SDL_Log("Could not save world");
+		}
+	}
 }
