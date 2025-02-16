@@ -54,20 +54,9 @@ namespace Terraria
 		{
 			for (int column = cameraColumn; column < maxColumn && column < m_WorldData[row].size(); column++)
 			{
-				switch (m_WorldData[row][column])
-				{
-				case 0: // No block
-					continue;
-					break;
-				case 1:
-					texture = ResourceManager::Instance().LoadTexture("stone", "tile/stone.png", renderer);
-					break;
-				case 2:
-					texture = ResourceManager::Instance().LoadTexture("ice_stone", "tile/ice_stone.png", renderer);
-					break;
-				default:
-					texture = nullptr;
-				}
+				uint32_t tileID = m_WorldData[row][column];
+				if (tileID == 0) continue; // 0 is an empty tile, don't render
+				texture = ResourceManager::Instance().LoadTexture(std::to_string(tileID), renderer);
 
 				if (texture != nullptr)
 				{

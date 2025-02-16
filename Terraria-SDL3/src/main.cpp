@@ -46,6 +46,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
     InitializeWorld(world);
     InitializeCharacter(character);
 
+    ResourceManager::Instance().LoadTexturePack("default");
+
     return SDL_AppResult::SDL_APP_CONTINUE;
 }
 

@@ -16,19 +16,17 @@ namespace Terraria
 		void operator=(const ResourceManager&) = delete;
 		static ResourceManager& Instance();
 
-		// Loads a texture from the given path. If a texture for "name" has already been loaded, it will be returned instead.
-		SDL_Texture* LoadTexture(const char* name, const char* path, SDL_Renderer* renderer);
+		// Loads the ID/path pairs from a texture pack's config.txt file for use when calling LoadTexture. The path should be relative to the texture pack's root directory.
+		bool LoadTexturePack(const std::string& name);
+		// Returns the texture for the associated ID. Returns nullptr if no texture pack has been loaded with a path to a texture for the ID.
+		SDL_Texture* LoadTexture(const std::string& ID, SDL_Renderer* renderer);
 		void Deinit();
 
 	private:
 		ResourceManager() {}
 
-		const char* m_PathToTextures = "../../../res/textures/";
-		std::unordered_map<std::string, SDL_Texture*> m_TextureMap;
-
-	public:
-		// Sets the root directory for searching for textures.
-		void SetTexturePath(const char* path) { m_PathToTextures = path; }
+		std::unordered_map<std::string, SDL_Texture*> m_TextureMap; // Holds loaded texture objects
+		std::unordered_map<std::string, std::string> m_IDToPathMap; // Holds ID/path pairs for finding unloaded textures
 
 	};
 }

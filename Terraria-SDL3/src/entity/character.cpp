@@ -15,7 +15,7 @@ namespace Terraria
 	Character::Character(float centerScreenX, float centerScreenY, SDL_Renderer* renderer, float xPos, float yPos) :
 		m_PosX(xPos), m_PosY(yPos)
 	{
-		auto texture = ResourceManager::Instance().LoadTexture("character", m_SpritePath, renderer);
+		auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
 		m_DrawX = centerScreenX - (m_SpriteWidth * 0.5f);
 		m_DrawY = centerScreenY - (m_SpriteHeight * 0.5f);
 	}
@@ -28,7 +28,7 @@ namespace Terraria
 
 	void Character::Render(SDL_Renderer* renderer, float cameraPosX, float cameraPosY)
 	{
-		auto texture = ResourceManager::Instance().LoadTexture("character", m_SpritePath, renderer);
+		auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
 		SDL_FRect dstRect = { m_DrawX, m_DrawY, m_SpriteWidth, m_SpriteHeight };
 		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, NULL, m_Direction);
 	}
