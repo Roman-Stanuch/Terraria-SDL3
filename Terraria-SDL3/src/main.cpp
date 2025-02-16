@@ -7,10 +7,10 @@
 #define SDL_MAIN_USE_CALLBACKS
 #include "SDL3/SDL_main.h"
 
-const uint32_t screenWidth = 1920;
-const uint32_t screenHeight = 1080;
-const bool fullscreen = false;
-const uint32_t characterYOffset = 100;
+const uint32_t SCREEN_WIDTH = 1920;
+const uint32_t SCREEN_HEIGHT = 1080;
+const bool     FULLSCREEN = false;
+const uint32_t CHARACTER_Y_OFFSET = 100;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -34,13 +34,13 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
         return SDL_AppResult::SDL_APP_FAILURE;
     }
     
-    if (!SDL_CreateWindowAndRenderer("Terraria in SDL3", screenWidth, screenHeight, 0, &window, &renderer))
+    if (!SDL_CreateWindowAndRenderer("Terraria in SDL3", SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer))
     {
         SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
         return SDL_AppResult::SDL_APP_FAILURE;
     }
 
-    SDL_SetWindowFullscreen(window, fullscreen);
+    SDL_SetWindowFullscreen(window, FULLSCREEN);
     SDL_SetRenderVSync(renderer, 1);
 
     InitializeWorld(world);
@@ -97,7 +97,7 @@ void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr)
     int screenWidth = 0;
     int screenHeight = 0;
     SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
-    characterPtr = std::make_unique<Character>((float)screenWidth * 0.5f, ((float)screenHeight * 0.5f) + characterYOffset, renderer);
+    characterPtr = std::make_unique<Character>((float)screenWidth * 0.5f, ((float)screenHeight * 0.5f) + CHARACTER_Y_OFFSET, renderer);
 }
 
 void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr)
