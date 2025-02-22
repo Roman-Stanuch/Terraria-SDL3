@@ -1,25 +1,25 @@
 #pragma once
 
 #include "terraria.h"
-#include "entity/entity.h"
-#include "render/renderable.h"
-
 #include "SDL3/SDL_surface.h"
 
 struct SDL_Texture;
+struct SDL_Renderer;
 
 namespace Terraria
 {
-	class Character : public Entity, public IRenderable
+	class World;
+
+	class Character
 	{
 	public:
 		// Creates a character centered on the screen based on the parameter values.
 		Character(float centerScreenX, float centerScreenY, SDL_Renderer* renderer, float xPos = 0.f, float yPos = 0.f);
 
-		virtual void Update(float deltaTime, World& world) override;
+		void Update(float deltaTime, World& world);
 
-		// Renders the character in the center of the screen. Camera position variables ignored.
-		virtual void Render(SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f) override;
+		// Renders the character in the center of the screen (based on constructor values).
+		void Render(SDL_Renderer* renderer);
 
 	private:
 		void HandleInput(float deltaTime); // Moves the character based on current Keyboard state.

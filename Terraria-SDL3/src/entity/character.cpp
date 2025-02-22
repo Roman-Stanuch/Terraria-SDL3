@@ -26,7 +26,7 @@ namespace Terraria
 		HandlePlacement(world);
 	}
 
-	void Character::Render(SDL_Renderer* renderer, float cameraPosX, float cameraPosY)
+	void Character::Render(SDL_Renderer* renderer)
 	{
 		auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
 		SDL_FRect dstRect = { m_DrawX, m_DrawY, SPRITE_WIDTH, SPRITE_HEIGHT };

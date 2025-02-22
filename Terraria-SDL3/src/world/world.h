@@ -1,21 +1,22 @@
 #pragma once
 
 #include "terraria.h"
-#include "render/renderable.h"
 
 #include <vector>
 #include <string>
 
+struct SDL_Renderer;
+
 namespace Terraria
 {
-	class World : public IRenderable
+	class World
 	{
 	public:
 		World(std::string worldName, uint32_t tileWidth = 16, uint32_t tileHeight = 16, std::string worldFolderPath = "../../../res/worlds/");
 		
 		// Renders the world based on the cameraPos parameters and the screen width/height. Only tiles in view will be rendered. cameraPos variables
 		// should be the top left corner of the desired render area and will be clamped to 0,0 if negative.
-		virtual void Render(SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f) override;
+		void Render(SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f);
 
 		// Get a the tileID at the given coordinates. 0,0 is the top left of the world. An invalid coordinate will return 0.
 		uint32_t GetTile(const uint32_t x, const uint32_t y);
