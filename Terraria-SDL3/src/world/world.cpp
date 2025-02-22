@@ -18,17 +18,36 @@ namespace Terraria
 		{
 			std::string rowData;
 			uint32_t currentTile;
+			bool firstRow = true;
+			uint32_t firstRowWidth = 0; // The length of the first row will be the length of all rows
 
+			// Go through each line of the world file
 			while (std::getline(worldStream, rowData))
 			{
 				std::istringstream sstream(rowData);
-				std::vector<uint32_t> constructedRow;
-				while (sstream >> currentTile)
+				uint32_t currentRowWidth = 0;
+
+				// Load tiles until currentRowWidth is equal to the firstRowWidth (or all tiles if it is the first row)
+				while (sstream >> currentTile && (currentRowWidth < firstRowWidth || firstRow == true))
 				{
-					constructedRow.push_back(currentTile);
+					m_WorldData.push_back(currentTile);
+
+					if (firstRow) firstRowWidth++;
+					currentRowWidth++;
 				}
-				m_WorldData.push_back(constructedRow);
+
+				// If not enough tiles were loaded to equal firstRowWidth, fill the rest of the row with 0
+				while (currentRowWidth < firstRowWidth)
+				{
+					m_WorldData.push_back(0);
+					currentRowWidth++;
+				}
+
+				firstRow = false;
 			}
+
+			m_WorldWidth = firstRowWidth;
+			m_WorldHeight = m_WorldData.size() / m_WorldWidth;
 		}
 		else
 		{
@@ -38,6 +57,7 @@ namespace Terraria
 
 	void World::Render(SDL_Renderer* renderer, float cameraPosX, float cameraPosY)
 	{
+		// Find the first visible row and column to the camera
 		int cameraRow = (int)std::max(cameraPosY / m_TileHeight, 0.f);
 		int cameraColumn = (int)std::max(cameraPosX / m_TileWidth, 0.f);
 
@@ -45,16 +65,17 @@ namespace Terraria
 		int screenHeight = 0;
 		SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
 
+		// Find the last visible row and column to the camera (plus some overdraw)
 		int maxRow = cameraRow + m_OverDraw + (screenHeight / m_TileHeight);
 		int maxColumn = cameraColumn + m_OverDraw + (screenWidth / m_TileWidth);
 
 		SDL_Texture* texture = nullptr;
 
-		for (int row = cameraRow; row < maxRow && row < m_WorldData.size(); row++)
+		for (int row = cameraRow; row < maxRow && row < GetWorldHeight(); row++)
 		{
-			for (int column = cameraColumn; column < maxColumn && column < m_WorldData[row].size(); column++)
+			for (int column = cameraColumn; column < maxColumn && column < GetWorldWidth(); column++)
 			{
-				uint32_t tileID = m_WorldData[row][column];
+				uint32_t tileID = m_WorldData[GetTileIndex(column, row)];
 				if (tileID == 0) continue; // 0 is an empty tile, don't render
 				texture = ResourceManager::Instance().LoadTexture(std::to_string(tileID), renderer);
 
@@ -71,12 +92,22 @@ namespace Terraria
 		}
 	}
 
+	uint32_t World::GetTile(const uint32_t x, const uint32_t y)
+	{
+		uint32_t index = GetTileIndex(x, y);
+		if (index < m_WorldData.size())
+			return m_WorldData[index];
+		else
+			return 0;
+	}
+
 	void World::SetTile(const uint32_t x, const uint32_t y, const uint32_t tileID)
 	{
-		if (x < GetWorldWidth() && y < GetWorldHeight())
-		{
-			m_WorldData[y][x] = tileID;
-		}
+		uint32_t index = GetTileIndex(x, y);
+		if (index < m_WorldData.size())
+			m_WorldData[index] = tileID;
+		else
+			return;
 	}
 
 	void World::SaveWorld(std::string worldName, std::string worldFolderPath)
@@ -84,19 +115,32 @@ namespace Terraria
 		std::ofstream worldStream(worldFolderPath + worldName);
 		if (worldStream)
 		{
-			for (int row = 0; row < GetWorldHeight(); row++)
+			uint32_t currentColumn = 0;
+			for (uint32_t tile : m_WorldData)
 			{
-				for (int column = 0; column < GetWorldWidth(); column++)
+				worldStream << tile;
+				if (currentColumn == m_WorldWidth - 1)
 				{
-					const char* separator = (column == m_WorldData[row].size() - 1) ? "\n" : " ";
-					worldStream << m_WorldData[row][column] << separator;
+					worldStream << "\n";
+					currentColumn = 0;
+				}
+				else
+				{
+					worldStream << " ";
+					currentColumn++;
 				}
 			}
+
 			worldStream.close();
 		}
 		else
 		{
 			SDL_Log("Could not save world");
 		}
+	}
+
+	uint32_t World::GetTileIndex(const uint32_t x, const uint32_t y) const
+	{
+		return m_WorldWidth * y + x;
 	}
 }
