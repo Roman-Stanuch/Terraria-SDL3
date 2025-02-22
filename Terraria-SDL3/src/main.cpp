@@ -2,9 +2,10 @@
 #include "resourcemanager.h"
 #include "world/world.h"
 #include "entity/character.h"
+#include "user_interface/imguihelper.h"
 
 #include "SDL3/SDL.h"
-#define SDL_MAIN_USE_CALLBACKS
+#define  SDL_MAIN_USE_CALLBACKS
 #include "SDL3/SDL_main.h"
 
 const uint32_t SCREEN_WIDTH = 1920;
@@ -43,6 +44,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
     SDL_SetWindowFullscreen(window, FULLSCREEN);
     SDL_SetRenderVSync(renderer, 1);
 
+    InitializeImGui(window, renderer);
+
     InitializeWorld(world);
     InitializeCharacter(character);
 
@@ -53,6 +56,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
+    ImGui_ImplSDL3_ProcessEvent(event);
+
     if (event->type == SDL_EVENT_QUIT)
         return SDL_APP_SUCCESS;
 
@@ -77,6 +82,14 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     world->Render(renderer, characterPosX, characterPosY);
     character->Render(renderer);
 
+    // Render UI
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
+    ImGui::Render();
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+
     SDL_RenderPresent(renderer);
 
     return SDL_AppResult::SDL_APP_CONTINUE;
@@ -86,6 +99,9 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
     world->SaveWorld("world.txt");
     ResourceManager::Instance().Deinit();
+
+    DeinitializeImGui();
+
     SDL_DestroyRenderer(renderer);
     renderer = nullptr;
     SDL_DestroyWindow(window);
