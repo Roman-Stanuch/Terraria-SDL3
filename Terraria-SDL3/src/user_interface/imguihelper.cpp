@@ -10,6 +10,7 @@ namespace Terraria
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_None;
+
         ImGui_ImplSDL3_InitForSDLRenderer(sdlWindow, sdlRenderer);
         ImGui_ImplSDLRenderer3_Init(sdlRenderer);
 	}

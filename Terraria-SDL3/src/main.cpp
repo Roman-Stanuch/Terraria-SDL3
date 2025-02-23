@@ -4,6 +4,7 @@
 #include "entity/character.h"
 #include "user_interface/imguihelper.h"
 #include "user_interface/hud.h"
+#include "input/input.h"
 
 #include "SDL3/SDL.h"
 #define  SDL_MAIN_USE_CALLBACKS
@@ -17,14 +18,14 @@ const uint32_t CHARACTER_Y_OFFSET = 100;
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 std::unique_ptr<Terraria::World> world = nullptr;
-std::unique_ptr<Terraria::Character> character = nullptr;
+Terraria::Character character;
 
 float deltaTime = 0.f;
 float timeLastFrame = 0.f;
 
-bool showHotbar = true;
+bool showToolbar = true;
 
-void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr);
+void InitializeCharacter(Terraria::Character& character);
 void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr);
 void CalculateDeltaTime(float& dt);
 
@@ -69,25 +70,24 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
+    // Update input
+    PollInput();
+
     // Update world
     CalculateDeltaTime(deltaTime);
-    character->Update(deltaTime, *world);
+    UpdateCharacter(character, deltaTime, *world);
 
     // Prepare rendering
     SDL_SetRenderDrawColor(renderer, 0x65, 0xB7, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
-    float characterPosX;
-    float characterPosY;
-    character->GetPosition(characterPosX, characterPosY);
-
     // Perform rendering
-    world->Render(renderer, characterPosX, characterPosY);
-    character->Render(renderer);
+    world->Render(renderer, character.posX, character.posY);
+    RenderCharacter(character.sprite, renderer);
 
     // Render UI
     StartImGuiFrameSDL();
-    DrawItemBar(SCREEN_WIDTH * 0.04f, showHotbar, 0);
+    DrawItemBar(SCREEN_WIDTH * 0.04f, showToolbar, 0);
     EndImGuiFrameSDL(renderer);
 
     SDL_RenderPresent(renderer);
@@ -108,12 +108,14 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result)
     window = nullptr;
 }
 
-void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr)
+void InitializeCharacter(Character& character)
 {
     int screenWidth = 0;
     int screenHeight = 0;
     SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
-    characterPtr = std::make_unique<Character>((float)screenWidth * 0.5f, ((float)screenHeight * 0.5f) + CHARACTER_Y_OFFSET, renderer);
+    auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
+    character.sprite.posX = (screenWidth * 0.5f) - (character.sprite.width * 0.5f);
+    character.sprite.posY = (screenHeight * 0.5f) - (character.sprite.height * 0.5f) + CHARACTER_Y_OFFSET;
 }
 
 void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr)

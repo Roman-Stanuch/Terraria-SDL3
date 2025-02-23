@@ -2,70 +2,64 @@
 #include "helper/conversion.h"
 #include "resourcemanager.h"
 #include "world/world.h"
+#include "input/input.h"
 
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_render.h"
 
+#include "ImGui/imgui.h"
+
 static const char* SPRITE_PATH = "character/character.png";
-static const float SPRITE_HEIGHT = 96.f;
-static const float SPRITE_WIDTH = 96.f;
 
 namespace Terraria
 {
-	Character::Character(float centerScreenX, float centerScreenY, SDL_Renderer* renderer, float xPos, float yPos) :
-		m_PosX(xPos), m_PosY(yPos)
+	void HandleCharacterInput(Character& character, float deltaTime);
+	void HandleBlockPlacement(Character& character, World& world);
+
+	void UpdateCharacter(Character& character, float deltaTime, World& world)
+	{
+		HandleCharacterInput(character, deltaTime);
+		HandleBlockPlacement(character, world);
+	}
+
+	void RenderCharacter(CharacterSprite& characterSprite, SDL_Renderer* renderer)
 	{
 		auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
-		m_DrawX = centerScreenX - (SPRITE_WIDTH * 0.5f);
-		m_DrawY = centerScreenY - (SPRITE_HEIGHT * 0.5f);
+		SDL_FRect dstRect = { characterSprite.posX, characterSprite.posY, characterSprite.width, characterSprite.height };
+		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, NULL, characterSprite.direction);
 	}
 
-	void Character::Update(float deltaTime, World& world)
+	void HandleCharacterInput(Character& character, float deltaTime)
 	{
-		HandleInput(deltaTime);
-		HandlePlacement(world);
-	}
-
-	void Character::Render(SDL_Renderer* renderer)
-	{
-		auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
-		SDL_FRect dstRect = { m_DrawX, m_DrawY, SPRITE_WIDTH, SPRITE_HEIGHT };
-		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, NULL, m_Direction);
-	}
-
-	void Character::HandleInput(float deltaTime)
-	{
-		auto keyboardState = SDL_GetKeyboardState(NULL);
-
-		if (keyboardState[SDL_SCANCODE_W])
+		if (GetKeyDown(SDL_SCANCODE_W))
 		{
-			m_PosY -= m_Speed * deltaTime;
+			character.posY -= 50.f * deltaTime;
 		}
-		if (keyboardState[SDL_SCANCODE_S])
+		if (GetKeyDown(SDL_SCANCODE_S))
 		{
-			m_PosY += m_Speed * deltaTime;
+			character.posY += 50.f * deltaTime;
 		}
-		if (keyboardState[SDL_SCANCODE_D])
+		if (GetKeyDown(SDL_SCANCODE_D))
 		{
-			m_PosX += m_Speed * deltaTime;
-			m_Direction = SDL_FLIP_NONE;
+			character.posX += 50.f * deltaTime;
+			character.sprite.direction = SDL_FLIP_NONE;
 		}
-		if (keyboardState[SDL_SCANCODE_A])
+		if (GetKeyDown(SDL_SCANCODE_A))
 		{
-			m_PosX -= m_Speed * deltaTime;
-			m_Direction = SDL_FLIP_HORIZONTAL;
+			character.posX -= 50.f * deltaTime;
+			character.sprite.direction = SDL_FLIP_HORIZONTAL;
 		}
 	}
 
-	void Character::HandlePlacement(World& world)
+	void HandleBlockPlacement(Character& character, World& world)
 	{
 		float mousePosX = 0;
 		float mousePosY = 0;
-		SDL_MouseButtonFlags mouseState = SDL_GetMouseState(&mousePosX, &mousePosY);
-		mousePosX += m_PosX;
-		mousePosY += m_PosY;
-
-		if (mouseState & SDL_BUTTON_LMASK)
+		GetMousePosition(mousePosX, mousePosY);
+		mousePosX += character.posX;
+		mousePosY += character.posY;
+		
+		if (GetMouseButtonDown(MouseButtonLeft, true))
 		{
 			ScreenToTileCoordinates(mousePosX, mousePosY, world);
 			world.SetTile((uint32_t)mousePosX, (uint32_t)mousePosY, 2);
