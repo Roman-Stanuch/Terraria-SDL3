@@ -62,7 +62,7 @@ namespace Terraria
 		if (GetMouseButtonDown(MouseButtonLeft, true))
 		{
 			ScreenToTileCoordinates(mousePosX, mousePosY, world);
-			world.SetTile((uint32_t)mousePosX, (uint32_t)mousePosY, 2);
+			SetWorldTile(world, (uint32_t)mousePosX, (uint32_t)mousePosY, 2);
 		}
 	}
 }

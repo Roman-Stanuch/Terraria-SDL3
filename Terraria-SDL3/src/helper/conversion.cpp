@@ -3,10 +3,10 @@
 
 namespace Terraria
 {
-	void Terraria::ScreenToTileCoordinates(float& x, float& y, World& world)
+	void Terraria::ScreenToTileCoordinates(float& x, float& y, const World& world)
 	{
-		x /= world.GetWorldTileWidth();
-		y /= world.GetWorldTileHeight();
+		x /= world.tileWidth;
+		y /= world.tileHeight;
 	}
 
 }

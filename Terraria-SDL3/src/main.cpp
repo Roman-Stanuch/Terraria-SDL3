@@ -13,11 +13,12 @@
 const uint32_t SCREEN_WIDTH = 1920;
 const uint32_t SCREEN_HEIGHT = 1080;
 const bool     FULLSCREEN = false;
+const bool     LOG_FPS = false;
 const uint32_t CHARACTER_Y_OFFSET = 100;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
-std::unique_ptr<Terraria::World> world = nullptr;
+Terraria::World currentWorld;
 Terraria::Character character;
 
 float deltaTime = 0.f;
@@ -26,7 +27,6 @@ float timeLastFrame = 0.f;
 bool showToolbar = true;
 
 void InitializeCharacter(Terraria::Character& character);
-void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr);
 void CalculateDeltaTime(float& dt);
 
 using namespace Terraria;
@@ -50,7 +50,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
 
     InitializeImGui(window, renderer);
 
-    InitializeWorld(world);
+    LoadWorld(currentWorld, "world.txt");
     InitializeCharacter(character);
 
     ResourceManager::Instance().LoadTexturePack("default");
@@ -71,18 +71,18 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
     // Update input
-    PollInput();
+    PollInput(LOG_FPS);
 
     // Update world
     CalculateDeltaTime(deltaTime);
-    UpdateCharacter(character, deltaTime, *world);
+    UpdateCharacter(character, deltaTime, currentWorld);
 
     // Prepare rendering
     SDL_SetRenderDrawColor(renderer, 0x65, 0xB7, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
     // Perform rendering
-    world->Render(renderer, character.posX, character.posY);
+    RenderWorld(currentWorld, renderer, character.posX, character.posY);
     RenderCharacter(character.sprite, renderer);
 
     // Render UI
@@ -97,7 +97,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-    world->SaveWorld("world.txt");
+    SaveWorld(currentWorld, "world.txt");
     ResourceManager::Instance().Deinit();
 
     DeinitializeImGui();
@@ -116,11 +116,6 @@ void InitializeCharacter(Character& character)
     auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
     character.sprite.posX = (screenWidth * 0.5f) - (character.sprite.width * 0.5f);
     character.sprite.posY = (screenHeight * 0.5f) - (character.sprite.height * 0.5f) + CHARACTER_Y_OFFSET;
-}
-
-void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr)
-{
-    worldPtr = std::make_unique<World>("world.txt", 32, 32);
 }
 
 void CalculateDeltaTime(float& dt)

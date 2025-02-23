@@ -10,8 +10,9 @@
 
 namespace Terraria
 {
-	World::World(std::string worldName, uint32_t tileWidth, uint32_t tileHeight, std::string worldFolderPath) :
-		m_TileWidth(tileWidth), m_TileHeight(tileHeight)
+	uint32_t GetTileIndex(const World& world, const uint32_t x, const uint32_t y);
+
+	bool LoadWorld(World& outWorld, std::string worldName, std::string worldFolderPath)
 	{
 		std::ifstream worldStream(worldFolderPath + worldName);
 		if (worldStream)
@@ -30,7 +31,7 @@ namespace Terraria
 				// Load tiles until currentRowWidth is equal to the firstRowWidth (or all tiles if it is the first row)
 				while (sstream >> currentTile && (currentRowWidth < firstRowWidth || firstRow == true))
 				{
-					m_WorldData.push_back(currentTile);
+					outWorld.tileData.push_back(currentTile);
 
 					if (firstRow) firstRowWidth++;
 					currentRowWidth++;
@@ -39,87 +40,41 @@ namespace Terraria
 				// If not enough tiles were loaded to equal firstRowWidth, fill the rest of the row with 0
 				while (currentRowWidth < firstRowWidth)
 				{
-					m_WorldData.push_back(0);
+					outWorld.tileData.push_back(0);
 					currentRowWidth++;
 				}
 
 				firstRow = false;
 			}
 
-			m_WorldWidth = firstRowWidth;
-			m_WorldHeight = m_WorldData.size() / m_WorldWidth;
-		}
-		else
-		{
-			SDL_Log("Could not load world");
-		}
-	}
-
-	void World::Render(SDL_Renderer* renderer, float cameraPosX, float cameraPosY)
-	{
-		// Find the first visible row and column to the camera
-		int cameraRow = (int)std::max(cameraPosY / m_TileHeight, 0.f);
-		int cameraColumn = (int)std::max(cameraPosX / m_TileWidth, 0.f);
-
-		int screenWidth = 0;
-		int screenHeight = 0;
-		SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
-
-		// Find the last visible row and column to the camera (plus some overdraw)
-		int maxRow = cameraRow + m_OverDraw + (screenHeight / m_TileHeight);
-		int maxColumn = cameraColumn + m_OverDraw + (screenWidth / m_TileWidth);
-
-		SDL_Texture* texture = nullptr;
-
-		for (int row = cameraRow; row < maxRow && row < GetWorldHeight(); row++)
-		{
-			for (int column = cameraColumn; column < maxColumn && column < GetWorldWidth(); column++)
+			if (outWorld.tileData.size() <= 0)
 			{
-				uint32_t tileID = m_WorldData[GetTileIndex(column, row)];
-				if (tileID == 0) continue; // 0 is an empty tile, don't render
-				texture = ResourceManager::Instance().LoadTexture(std::to_string(tileID), renderer);
-
-				if (texture != nullptr)
-				{
-					SDL_FRect dstRect = { column * (float)m_TileWidth - cameraPosX, row * (float)m_TileHeight - cameraPosY, (float)m_TileWidth, (float)m_TileHeight };
-					SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
-				}
-				else
-				{
-					SDL_Log("Could not find valid texture for tile at Row: %i | Column: %i", row, column);
-				}
+				SDL_Log("World \"%s\" contained no data", worldName.c_str());
+				return false;
 			}
+
+			outWorld.width = firstRowWidth;
+			outWorld.height = outWorld.tileData.size() / outWorld.width;
+
+			return true;
+		}
+		else
+		{
+			SDL_Log("Could not open world file: %s", worldName.c_str());
+			return false;
 		}
 	}
 
-	uint32_t World::GetTile(const uint32_t x, const uint32_t y)
-	{
-		uint32_t index = GetTileIndex(x, y);
-		if (index < m_WorldData.size())
-			return m_WorldData[index];
-		else
-			return 0;
-	}
-
-	void World::SetTile(const uint32_t x, const uint32_t y, const uint32_t tileID)
-	{
-		uint32_t index = GetTileIndex(x, y);
-		if (index < m_WorldData.size())
-			m_WorldData[index] = tileID;
-		else
-			return;
-	}
-
-	void World::SaveWorld(std::string worldName, std::string worldFolderPath)
+	bool SaveWorld(World& world, std::string worldName, std::string worldFolderPath)
 	{
 		std::ofstream worldStream(worldFolderPath + worldName);
 		if (worldStream)
 		{
 			uint32_t currentColumn = 0;
-			for (uint32_t tile : m_WorldData)
+			for (uint32_t tile : world.tileData)
 			{
 				worldStream << tile;
-				if (currentColumn == m_WorldWidth - 1)
+				if (currentColumn == world.width - 1)
 				{
 					worldStream << "\n";
 					currentColumn = 0;
@@ -132,15 +87,76 @@ namespace Terraria
 			}
 
 			worldStream.close();
+			return true;
 		}
 		else
 		{
 			SDL_Log("Could not save world");
+			return false;
 		}
 	}
 
-	uint32_t World::GetTileIndex(const uint32_t x, const uint32_t y) const
+	void RenderWorld(World& world, SDL_Renderer* renderer, float cameraPosX, float cameraPosY)
 	{
-		return m_WorldWidth * y + x;
+		// Find the first visible row and column to the camera
+		int cameraRow = (int)std::max(cameraPosY / world.tileHeight, 0.f);
+		int cameraColumn = (int)std::max(cameraPosX / world.tileWidth, 0.f);
+
+		int screenWidth = 0;
+		int screenHeight = 0;
+		SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
+
+		// Find the last visible row and column to the camera (plus some overdraw)
+		int maxRow = cameraRow + world.overdrawAmount + (screenHeight / world.tileHeight);
+		int maxColumn = cameraColumn + world.overdrawAmount + (screenWidth / world.tileWidth);
+
+		SDL_Texture* texture = nullptr;
+
+		for (int row = cameraRow; row < maxRow && row < world.height; row++)
+		{
+			for (int column = cameraColumn; column < maxColumn && column < world.width; column++)
+			{
+				uint32_t tileID = world.tileData[GetTileIndex(world, column, row)];
+				if (tileID == 0) continue; // 0 is an empty tile, don't render
+				texture = ResourceManager::Instance().LoadTexture(std::to_string(tileID), renderer);
+
+				if (texture != nullptr)
+				{
+					SDL_FRect dstRect = { column * (float)world.tileWidth - cameraPosX, row * (float)world.tileHeight - cameraPosY, (float)world.tileWidth, (float)world.tileHeight };
+					SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
+				}
+				else
+				{
+					SDL_Log("Could not find valid texture for tile at Row: %i | Column: %i", row, column);
+				}
+			}
+		}
+	}
+
+	void SetWorldTile(World& world, const uint32_t x, const uint32_t y, const uint32_t tileID)
+	{
+		if (x > world.width || y > world.height) return;
+
+		uint32_t index = GetTileIndex(world, x, y);
+		if (index < world.tileData.size())
+			world.tileData[index] = tileID;
+		else
+			return;
+	}
+
+	uint32_t GetWorldTile(World& world, const uint32_t x, const uint32_t y)
+	{
+		if (x > world.width || y > world.height) return 0;
+
+		uint32_t index = GetTileIndex(world, x, y);
+		if (index < world.tileData.size())
+			return world.tileData[index];
+		else
+			return 0;
+	}
+
+	uint32_t GetTileIndex(const World& world, const uint32_t x, const uint32_t y)
+	{
+		return world.width * y + x;
 	}
 }

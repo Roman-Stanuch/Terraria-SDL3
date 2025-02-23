@@ -8,7 +8,7 @@ struct SDL_Renderer;
 
 namespace Terraria
 {
-	class World;
+	struct World;
 
 	struct CharacterSprite
 	{

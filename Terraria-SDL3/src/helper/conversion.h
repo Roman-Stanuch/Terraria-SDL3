@@ -2,8 +2,8 @@
 
 namespace Terraria
 {
-	class World;
+	struct World;
 
-	void ScreenToTileCoordinates(float& x, float& y, World& world);
+	void ScreenToTileCoordinates(float& x, float& y, const World& world);
 
 }
