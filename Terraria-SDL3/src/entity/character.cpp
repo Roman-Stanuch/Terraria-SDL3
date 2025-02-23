@@ -53,8 +53,7 @@ namespace Terraria
 
 	void HandleBlockPlacement(Character& character, World& world)
 	{
-		float mousePosX = 0;
-		float mousePosY = 0;
+		float mousePosX = 0, mousePosY = 0;
 		GetMousePosition(mousePosX, mousePosY);
 		mousePosX += character.posX;
 		mousePosY += character.posY;
@@ -62,7 +61,11 @@ namespace Terraria
 		if (GetMouseButtonDown(MouseButtonLeft, true))
 		{
 			ScreenToTileCoordinates(mousePosX, mousePosY, world);
-			SetWorldTile(world, (uint32_t)mousePosX, (uint32_t)mousePosY, 2);
+			uint32_t mouseTilePosX = (uint32_t)mousePosX, mouseTilePosY = (uint32_t)mousePosY;
+
+			if (IsTileSurroundedByAir(world, mouseTilePosX, mouseTilePosY)) return;
+
+			SetWorldTile(world, mouseTilePosX, mouseTilePosY, 2);
 		}
 	}
 }

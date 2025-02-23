@@ -144,7 +144,7 @@ namespace Terraria
 			return;
 	}
 
-	uint32_t GetWorldTile(World& world, const uint32_t x, const uint32_t y)
+	uint32_t GetWorldTile(const World& world, const uint32_t x, const uint32_t y)
 	{
 		if (x > world.width || y > world.height) return 0;
 
@@ -153,6 +153,16 @@ namespace Terraria
 			return world.tileData[index];
 		else
 			return 0;
+	}
+
+	bool IsTileSurroundedByAir(const World& world, uint32_t x, uint32_t y)
+	{
+		if (GetWorldTile(world, x, y - 1)) return false;
+		if (GetWorldTile(world, x, y + 1)) return false;
+		if (GetWorldTile(world, x - 1, y)) return false;
+		if (GetWorldTile(world, x + 1, y)) return false;
+
+		return true;
 	}
 
 	uint32_t GetTileIndex(const World& world, const uint32_t x, const uint32_t y)

@@ -32,6 +32,9 @@ namespace Terraria
 	void SetWorldTile(World& world, const uint32_t x, const uint32_t y, const uint32_t tileID);
 	// Gets the tile at the given coordinates (in tile coordinates with 0,0 being the top left of the world).
 	// Will return 0 (air) if the coordinates are out of the world's width or height.
-	uint32_t GetWorldTile(World& world, const uint32_t x, const uint32_t y);
+	uint32_t GetWorldTile(const World& world, const uint32_t x, const uint32_t y);
+	
+	// Returns true if the four tiles surrounding the given tile coordinate are air (0)
+	bool IsTileSurroundedByAir(const World& world, uint32_t x, uint32_t y);
 
 }
