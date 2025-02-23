@@ -30,7 +30,7 @@ add_executable(Terraria src/main.cpp
 "vendor/includes/ImGui/imstb_rectpack.h"
 "vendor/includes/ImGui/imstb_textedit.h"
 "vendor/includes/ImGui/imstb_truetype.h"
-)
+ "src/user_interface/hud.h" "src/user_interface/hud.cpp" )
 
 target_link_libraries(Terraria
     PRIVATE 

@@ -3,6 +3,7 @@
 #include "world/world.h"
 #include "entity/character.h"
 #include "user_interface/imguihelper.h"
+#include "user_interface/hud.h"
 
 #include "SDL3/SDL.h"
 #define  SDL_MAIN_USE_CALLBACKS
@@ -20,6 +21,8 @@ std::unique_ptr<Terraria::Character> character = nullptr;
 
 float deltaTime = 0.f;
 float timeLastFrame = 0.f;
+
+bool showHotbar = true;
 
 void InitializeCharacter(std::unique_ptr<Terraria::Character>& characterPtr);
 void InitializeWorld(std::unique_ptr<Terraria::World>& worldPtr);
@@ -83,12 +86,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     character->Render(renderer);
 
     // Render UI
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
-    ImGui::Render();
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+    StartImGuiFrameSDL();
+    DrawItemBar(SCREEN_WIDTH * 0.04f, showHotbar, 0);
+    EndImGuiFrameSDL(renderer);
 
     SDL_RenderPresent(renderer);
 

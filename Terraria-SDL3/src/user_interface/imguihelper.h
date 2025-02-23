@@ -11,4 +11,8 @@ namespace Terraria
 {
 	void InitializeImGui(SDL_Window* sdlWindow, SDL_Renderer* sdlRenderer);
 	void DeinitializeImGui();
+
+	void StartImGuiFrameSDL();
+	void EndImGuiFrameSDL(SDL_Renderer* sdlRenderer);
+
 }
