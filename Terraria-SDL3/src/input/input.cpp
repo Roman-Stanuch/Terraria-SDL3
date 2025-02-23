@@ -29,7 +29,22 @@ namespace Terraria
 	bool Terraria::GetMouseButtonDown(MouseButton button, bool checkAgainstUI)
 	{
 		if (checkAgainstUI && inputState.hoveringOverUI) return false;
-		return inputState.mouseState & (button + 1); // SDL Button codes are 1 more than ImGui and ours
+		
+		uint8_t mouseButtonMask = 0;
+		switch (button)
+		{
+		case MouseButtonLeft:
+			mouseButtonMask = SDL_BUTTON_LMASK;
+			break;
+		case MouseButtonMiddle:
+			mouseButtonMask = SDL_BUTTON_MMASK;
+			break;
+		case MouseButtonRight:
+			mouseButtonMask = SDL_BUTTON_RMASK;
+			break;
+		}
+
+		return inputState.mouseState & mouseButtonMask;
 	}
 
 	bool GetKeyDown(int key)

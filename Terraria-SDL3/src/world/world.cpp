@@ -118,7 +118,7 @@ namespace Terraria
 			{
 				uint32_t tileID = world.tileData[GetTileIndex(world, column, row)];
 				if (tileID == 0) continue; // 0 is an empty tile, don't render
-				texture = ResourceManager::Instance().LoadTexture(std::to_string(tileID), renderer);
+				texture = Resource::LoadTexture(std::to_string(tileID), renderer);
 
 				if (texture != nullptr)
 				{

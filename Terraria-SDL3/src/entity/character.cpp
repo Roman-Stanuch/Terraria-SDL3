@@ -24,7 +24,7 @@ namespace Terraria
 
 	void RenderCharacter(CharacterSprite& characterSprite, SDL_Renderer* renderer)
 	{
-		auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
+		auto texture = Resource::LoadTexture("character", renderer);
 		SDL_FRect dstRect = { characterSprite.posX, characterSprite.posY, characterSprite.width, characterSprite.height };
 		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, NULL, characterSprite.direction);
 	}
@@ -57,15 +57,17 @@ namespace Terraria
 		GetMousePosition(mousePosX, mousePosY);
 		mousePosX += character.posX;
 		mousePosY += character.posY;
-		
+		ScreenToTileCoordinates(mousePosX, mousePosY, world);
+		uint32_t mouseTilePosX = (uint32_t)mousePosX, mouseTilePosY = (uint32_t)mousePosY;
+
 		if (GetMouseButtonDown(MouseButtonLeft, true))
 		{
-			ScreenToTileCoordinates(mousePosX, mousePosY, world);
-			uint32_t mouseTilePosX = (uint32_t)mousePosX, mouseTilePosY = (uint32_t)mousePosY;
-
 			if (IsTileSurroundedByAir(world, mouseTilePosX, mouseTilePosY)) return;
-
 			SetWorldTile(world, mouseTilePosX, mouseTilePosY, 2);
+		}
+		else if (GetMouseButtonDown(MouseButtonRight, true))
+		{
+			SetWorldTile(world, mouseTilePosX, mouseTilePosY, 0);
 		}
 	}
 }

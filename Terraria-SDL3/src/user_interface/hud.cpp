@@ -23,7 +23,7 @@ namespace Terraria
 
 			ImVec4 finalColor = (i == selectedItemIndex) ? DEFAULT_SELECTED_ITEM_BOX_COLOR : itemBoxColor;
 			ImGui::PushStyleColor(ImGuiCol_Button, finalColor);
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, DEFAULT_SELECTED_ITEM_BOX_COLOR);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, finalColor);
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, finalColor);
 
 			ImGui::Button("Item", itemBoxSizeVector);

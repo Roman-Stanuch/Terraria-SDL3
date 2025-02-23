@@ -53,7 +53,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
     LoadWorld(currentWorld, "world.txt");
     InitializeCharacter(character);
 
-    ResourceManager::Instance().LoadTexturePack("default");
+    Resource::LoadTexturePack("default");
 
     return SDL_AppResult::SDL_APP_CONTINUE;
 }
@@ -98,7 +98,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
     SaveWorld(currentWorld, "world.txt");
-    ResourceManager::Instance().Deinit();
+    Resource::ClearResources();
 
     DeinitializeImGui();
 
@@ -113,7 +113,7 @@ void InitializeCharacter(Character& character)
     int screenWidth = 0;
     int screenHeight = 0;
     SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
-    auto texture = ResourceManager::Instance().LoadTexture("character", renderer);
+    auto texture = Resource::LoadTexture("character", renderer);
     character.sprite.posX = (screenWidth * 0.5f) - (character.sprite.width * 0.5f);
     character.sprite.posY = (screenHeight * 0.5f) - (character.sprite.height * 0.5f) + CHARACTER_Y_OFFSET;
 }

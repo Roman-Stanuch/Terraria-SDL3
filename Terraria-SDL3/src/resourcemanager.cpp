@@ -9,13 +9,10 @@ static const char* TEXTURE_PACK_PATH = "../../../res/texture_packs/";
 
 namespace Terraria
 {
-	ResourceManager& ResourceManager::Instance()
-	{
-		static ResourceManager instance;
-		return instance;
-	}
+	static std::unordered_map<std::string, SDL_Texture*> textureMap; // Holds loaded texture objects
+	static std::unordered_map<std::string, std::string> idToPathMap; // Holds ID/path pairs for finding unloaded textures
 
-	bool ResourceManager::LoadTexturePack(const std::string& name)
+	bool Resource::LoadTexturePack(const std::string& name)
 	{
 		std::string texturePackRoot = TEXTURE_PACK_PATH + name + "/";
 		std::string configPath = texturePackRoot + "config.txt";
@@ -29,7 +26,7 @@ namespace Terraria
 				std::string textureName;
 				sstream >> textureID;
 				sstream >> textureName;
-				m_IDToPathMap.insert({ textureID, texturePackRoot + textureName });
+				idToPathMap.insert({ textureID, texturePackRoot + textureName });
 			}
 			return true;
 		}
@@ -40,18 +37,18 @@ namespace Terraria
 		}
 	}
 
-	SDL_Texture* ResourceManager::LoadTexture(const std::string& ID, SDL_Renderer* renderer)
+	SDL_Texture* Resource::LoadTexture(const std::string& ID, SDL_Renderer* renderer)
 	{
 		// Return the texture if already loaded
-		if (m_TextureMap.find(ID) != m_TextureMap.end())
+		if (textureMap.find(ID) != textureMap.end())
 		{
-			return m_TextureMap[ID];
+			return textureMap[ID];
 		}
 
-		if (m_IDToPathMap.find(ID) != m_IDToPathMap.end())
+		if (idToPathMap.find(ID) != idToPathMap.end())
 		{
-			m_TextureMap.insert({ ID, IMG_LoadTexture(renderer, m_IDToPathMap[ID].c_str())});
-			return m_TextureMap[ID];
+			textureMap.insert({ ID, IMG_LoadTexture(renderer, idToPathMap[ID].c_str()) });
+			return textureMap[ID];
 		}
 		else
 		{
@@ -59,12 +56,12 @@ namespace Terraria
 		}
 	}
 
-	void ResourceManager::Deinit()
+	void Resource::ClearResources()
 	{
-		for (auto& row : m_TextureMap)
+		for (auto& row : textureMap)
 		{
 			SDL_DestroyTexture(row.second);
 		}
-		m_TextureMap.clear();
+		textureMap.clear();
 	}
 }
