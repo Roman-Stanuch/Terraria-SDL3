@@ -7,8 +7,6 @@
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_render.h"
 
-#include "ImGui/imgui.h"
-
 static const char* SPRITE_PATH = "character/character.png";
 
 namespace Terraria
