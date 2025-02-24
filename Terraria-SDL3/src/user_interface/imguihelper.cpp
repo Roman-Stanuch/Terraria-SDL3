@@ -2,6 +2,8 @@
 
 #include "SDL3/SDL.h"
 
+static const char* FONT_PATH = "../../../res/fonts/default.ttf";
+
 namespace Terraria
 {
 	void InitializeImGui(SDL_Window* sdlWindow, SDL_Renderer* sdlRenderer)
@@ -10,6 +12,7 @@ namespace Terraria
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_None;
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(FONT_PATH, 18.f);
 
         ImGui_ImplSDL3_InitForSDLRenderer(sdlWindow, sdlRenderer);
         ImGui_ImplSDLRenderer3_Init(sdlRenderer);

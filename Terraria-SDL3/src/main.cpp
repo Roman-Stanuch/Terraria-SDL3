@@ -25,6 +25,7 @@ float deltaTime = 0.f;
 float timeLastFrame = 0.f;
 
 bool showToolbar = true;
+int highlightedTool = 0;
 
 void InitializeCharacter(Terraria::Character& character);
 void CalculateDeltaTime(float& dt);
@@ -63,7 +64,13 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     ImGui_ImplSDL3_ProcessEvent(event);
 
     if (event->type == SDL_EVENT_QUIT)
+    {
         return SDL_APP_SUCCESS;
+    }
+    else if (event->type == SDL_EVENT_MOUSE_WHEEL)
+    {
+        UpdateMouseScroll(event->wheel.y);
+    }
 
     return SDL_APP_CONTINUE;
 }
@@ -77,6 +84,18 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     CalculateDeltaTime(deltaTime);
     UpdateCharacter(character, deltaTime, currentWorld);
 
+    // Temporary scrolling test
+    if (GetMouseScroll(MouseScrollUp))
+    {
+        highlightedTool--;
+        if (highlightedTool < 0) highlightedTool = 9;
+    }
+    else if (GetMouseScroll(MouseScrollDown))
+    {
+        highlightedTool++;
+        if (highlightedTool > 9) highlightedTool = 0;
+    }
+
     // Prepare rendering
     SDL_SetRenderDrawColor(renderer, 0x65, 0xB7, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
@@ -87,7 +106,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     // Render UI
     StartImGuiFrameSDL();
-    DrawItemBar(SCREEN_WIDTH * 0.04f, showToolbar, 0);
+    DrawItemBar(SCREEN_WIDTH * 0.04f, showToolbar, highlightedTool);
     EndImGuiFrameSDL(renderer);
 
     SDL_RenderPresent(renderer);
