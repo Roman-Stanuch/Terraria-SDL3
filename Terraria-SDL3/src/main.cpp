@@ -1,5 +1,5 @@
 ﻿#include "terraria.h"
-#include "resourcemanager.h"
+#include "resource/resources.h"
 #include "world/world.h"
 #include "entity/character.h"
 #include "user_interface/imguihelper.h"

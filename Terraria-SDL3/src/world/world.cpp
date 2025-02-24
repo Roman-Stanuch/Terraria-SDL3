@@ -1,5 +1,5 @@
 #include "world.h"
-#include "resourcemanager.h"
+#include "resource/resources.h"
 
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_render.h"
@@ -54,7 +54,7 @@ namespace Terraria
 			}
 
 			outWorld.width = firstRowWidth;
-			outWorld.height = outWorld.tileData.size() / outWorld.width;
+			outWorld.height = (uint32_t)(outWorld.tileData.size() / outWorld.width);
 
 			return true;
 		}
@@ -112,9 +112,9 @@ namespace Terraria
 
 		SDL_Texture* texture = nullptr;
 
-		for (int row = cameraRow; row < maxRow && row < world.height; row++)
+		for (uint32_t row = cameraRow; row < maxRow && row < world.height; row++)
 		{
-			for (int column = cameraColumn; column < maxColumn && column < world.width; column++)
+			for (uint32_t column = cameraColumn; column < maxColumn && column < world.width; column++)
 			{
 				uint32_t tileID = world.tileData[GetTileIndex(world, column, row)];
 				if (tileID == 0) continue; // 0 is an empty tile, don't render

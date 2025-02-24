@@ -4,8 +4,8 @@ project(Terraria)
 
 add_executable(Terraria src/main.cpp
  "src/terraria.h"
- "src/resourcemanager.h"
- "src/resourcemanager.cpp"
+ "src/resource/resources.h"
+ "src/resource/resources.cpp"
  "src/world/world.h"
  "src/world/world.cpp"
  "src/entity/character.h"

@@ -1,6 +1,6 @@
 #include "character.h"
 #include "helper/conversion.h"
-#include "resourcemanager.h"
+#include "resource/resources.h"
 #include "world/world.h"
 #include "input/input.h"
 
