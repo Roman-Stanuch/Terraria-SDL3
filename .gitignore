@@ -413,3 +413,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# JetBrains CLion
+Terraria-SDL3/.idea
