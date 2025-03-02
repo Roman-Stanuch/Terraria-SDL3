@@ -10,12 +10,11 @@
 
 namespace Terraria
 {
-	uint32_t GetTileIndex(const World& world, const uint32_t x, const uint32_t y);
+	uint32_t GetTileIndex(const World& world, uint32_t x, uint32_t y);
 
-	bool LoadWorld(World& outWorld, std::string worldName, std::string worldFolderPath)
+	bool LoadWorld(World& outWorld, const std::string &worldName, const std::string &worldFolderPath)
 	{
-		std::ifstream worldStream(worldFolderPath + worldName);
-		if (worldStream)
+		if (std::ifstream worldStream(worldFolderPath + worldName); worldStream)
 		{
 			std::string rowData;
 			uint32_t currentTile;
@@ -47,14 +46,14 @@ namespace Terraria
 				firstRow = false;
 			}
 
-			if (outWorld.tileData.size() <= 0)
+			if (outWorld.tileData.empty())
 			{
 				SDL_Log("World \"%s\" contained no data", worldName.c_str());
 				return false;
 			}
 
 			outWorld.width = firstRowWidth;
-			outWorld.height = (uint32_t)(outWorld.tileData.size() / outWorld.width);
+			outWorld.height = static_cast<uint32_t>(outWorld.tileData.size() / outWorld.width);
 
 			return true;
 		}
@@ -65,13 +64,12 @@ namespace Terraria
 		}
 	}
 
-	bool SaveWorld(World& world, std::string worldName, std::string worldFolderPath)
+	bool SaveWorld(World& world, const std::string &worldName, const std::string &worldFolderPath)
 	{
-		std::ofstream worldStream(worldFolderPath + worldName);
-		if (worldStream)
+		if (std::ofstream worldStream(worldFolderPath + worldName); worldStream)
 		{
 			uint32_t currentColumn = 0;
-			for (uint32_t tile : world.tileData)
+			for (const uint32_t tile : world.tileData)
 			{
 				worldStream << tile;
 				if (currentColumn == world.width - 1)
@@ -96,19 +94,23 @@ namespace Terraria
 		}
 	}
 
-	void RenderWorld(World& world, SDL_Renderer* renderer, float cameraPosX, float cameraPosY)
+	void RenderWorld(const World &world, SDL_Renderer* renderer, const float cameraPosX, const float cameraPosY)
 	{
+		// Cache the world's tile size
+		const auto worldTileWidth = static_cast<float>(world.tileWidth);
+		const auto worldTileHeight = static_cast<float>(world.tileHeight);
+
 		// Find the first visible row and column to the camera
-		int cameraRow = (int)std::max(cameraPosY / world.tileHeight, 0.f);
-		int cameraColumn = (int)std::max(cameraPosX / world.tileWidth, 0.f);
+		const int cameraRow = static_cast<int>(std::max(cameraPosY / worldTileHeight, 0.f));
+		const int cameraColumn = static_cast<int>(std::max(cameraPosX / worldTileWidth, 0.f));
 
 		int screenWidth = 0;
 		int screenHeight = 0;
 		SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
 
 		// Find the last visible row and column to the camera (plus some overdraw)
-		int maxRow = cameraRow + world.overdrawAmount + (screenHeight / world.tileHeight);
-		int maxColumn = cameraColumn + world.overdrawAmount + (screenWidth / world.tileWidth);
+		const uint32_t maxRow = cameraRow + world.overdrawAmount + (screenHeight / world.tileHeight);
+		const uint32_t maxColumn = cameraColumn + world.overdrawAmount + (screenWidth / world.tileWidth);
 
 		SDL_Texture* texture = nullptr;
 
@@ -116,13 +118,13 @@ namespace Terraria
 		{
 			for (uint32_t column = cameraColumn; column < maxColumn && column < world.width; column++)
 			{
-				uint32_t tileID = world.tileData[GetTileIndex(world, column, row)];
+				const uint32_t tileID = world.tileData[GetTileIndex(world, column, row)];
 				if (tileID == 0) continue; // 0 is an empty tile, don't render
 				texture = Resource::LoadTexture(std::to_string(tileID), renderer);
 
 				if (texture != nullptr)
 				{
-					SDL_FRect dstRect = { column * (float)world.tileWidth - cameraPosX, row * (float)world.tileHeight - cameraPosY, (float)world.tileWidth, (float)world.tileHeight };
+					SDL_FRect dstRect = { static_cast<float>(column) * worldTileWidth - cameraPosX, static_cast<float>(row) * worldTileHeight - cameraPosY, worldTileWidth, worldTileHeight };
 					SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
 				}
 				else
@@ -155,7 +157,7 @@ namespace Terraria
 			return 0;
 	}
 
-	bool IsTileSurroundedByAir(const World& world, uint32_t x, uint32_t y)
+	bool IsTileSurroundedByAir(const World& world, const uint32_t x, const uint32_t y)
 	{
 		if (GetWorldTile(world, x, y - 1)) return false;
 		if (GetWorldTile(world, x, y + 1)) return false;

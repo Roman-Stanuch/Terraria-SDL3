@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <SDL3/SDL_render.h>
 
 struct SDL_Renderer;
 
@@ -21,20 +22,19 @@ namespace Terraria
 	};
 
 	// Attempts to load a world file into outWorld.
-	bool LoadWorld(World& outWorld, std::string worldName, std::string worldFolderPath = "../../../res/worlds/");
+	bool LoadWorld(World& outWorld, const std::string& worldName, const std::string& worldFolderPath = "../../../res/worlds/");
 	// Saves the tileData of the current world to a worldName.txt file in worldFolderPath
-	bool SaveWorld(World& world, std::string worldName, std::string worldFolderPath = "../../../res/worlds/");
+	bool SaveWorld(World& world, const std::string& worldName, const std::string& worldFolderPath = "../../../res/worlds/");
 
-	void RenderWorld(World& world, SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f);
+	void RenderWorld(const World& world, SDL_Renderer* renderer, float cameraPosX = 0.f, float cameraPosY = 0.f);
 
 	// Sets the tile at the given coordinates (in tile coordinates with 0,0 being the top left of the world).
 	// Will do nothing if the coordinates are out of the world's width or height.
-	void SetWorldTile(World& world, const uint32_t x, const uint32_t y, const uint32_t tileID);
+	void SetWorldTile(World& world, uint32_t x, uint32_t y, uint32_t tileID);
 	// Gets the tile at the given coordinates (in tile coordinates with 0,0 being the top left of the world).
 	// Will return 0 (air) if the coordinates are out of the world's width or height.
-	uint32_t GetWorldTile(const World& world, const uint32_t x, const uint32_t y);
+	uint32_t GetWorldTile(const World& world, uint32_t x, uint32_t y);
 	
 	// Returns true if the four tiles surrounding the given tile coordinate are air (0)
 	bool IsTileSurroundedByAir(const World& world, uint32_t x, uint32_t y);
-
 }

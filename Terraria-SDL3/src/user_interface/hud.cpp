@@ -2,7 +2,7 @@
 
 namespace Terraria
 {
-	void DrawItemBar(float itemBoxSize, bool& openBool, int selectedItemIndex, const ImVec4& itemBoxColor)
+	void DrawItemBar(const float itemBoxSize, bool& openBool, const int selectedItemIndex, const ImVec4& itemBoxColor)
 	{
 		ImGui::SetNextWindowPos(ImVec2(0.f, 0.f));
 		ImGui::Begin(
@@ -15,7 +15,7 @@ namespace Terraria
 			ImGuiWindowFlags_AlwaysAutoResize
 		);
 
-		const ImVec2 itemBoxSizeVector = ImVec2(itemBoxSize, itemBoxSize);
+		const auto itemBoxSizeVector = ImVec2(itemBoxSize, itemBoxSize);
 		for (int i = 0; i < 10; i++)
 		{
 			if (i != 0) ImGui::SameLine();

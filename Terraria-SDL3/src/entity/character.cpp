@@ -7,27 +7,27 @@
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_render.h"
 
-static const char* SPRITE_PATH = "character/character.png";
+static auto SPRITE_PATH = "character";
 
 namespace Terraria
 {
 	void HandleCharacterInput(Character& character, float deltaTime);
-	void HandleBlockPlacement(Character& character, World& world);
+	void HandleBlockPlacement(const Character& character, World& world);
 
-	void UpdateCharacter(Character& character, float deltaTime, World& world)
+	void UpdateCharacter(Character& character, const float deltaTime, World& world)
 	{
 		HandleCharacterInput(character, deltaTime);
 		HandleBlockPlacement(character, world);
 	}
 
-	void RenderCharacter(CharacterSprite& characterSprite, SDL_Renderer* renderer)
+	void RenderCharacter(const CharacterSprite& characterSprite, SDL_Renderer* renderer)
 	{
-		auto texture = Resource::LoadTexture("character", renderer);
-		SDL_FRect dstRect = { characterSprite.posX, characterSprite.posY, characterSprite.width, characterSprite.height };
-		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, NULL, characterSprite.direction);
+		const auto texture = Resource::LoadTexture(SPRITE_PATH, renderer);
+		const SDL_FRect dstRect = { characterSprite.posX, characterSprite.posY, characterSprite.width, characterSprite.height };
+		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, nullptr, characterSprite.direction);
 	}
 
-	void HandleCharacterInput(Character& character, float deltaTime)
+	void HandleCharacterInput(Character& character, const float deltaTime)
 	{
 		if (GetKeyDown(SDL_SCANCODE_W))
 		{
@@ -49,14 +49,15 @@ namespace Terraria
 		}
 	}
 
-	void HandleBlockPlacement(Character& character, World& world)
+	void HandleBlockPlacement(const Character& character, World& world)
 	{
 		float mousePosX = 0, mousePosY = 0;
 		GetMousePosition(mousePosX, mousePosY);
 		mousePosX += character.posX;
 		mousePosY += character.posY;
 		ScreenToTileCoordinates(mousePosX, mousePosY, world);
-		uint32_t mouseTilePosX = (uint32_t)mousePosX, mouseTilePosY = (uint32_t)mousePosY;
+		const auto mouseTilePosX = static_cast<uint32_t>(mousePosX);
+		const auto mouseTilePosY = static_cast<uint32_t>(mousePosY);
 
 		if (GetMouseButtonDown(MouseButtonLeft, true))
 		{

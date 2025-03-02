@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-static const float MIN_SCROLL = 0.01f;
+static constexpr float MIN_SCROLL = 0.01f;
 
 static struct InputState
 {
@@ -24,23 +24,23 @@ static struct InputState
 
 namespace Terraria
 {
-	void PollInput(bool logFPS)
+	void PollInput(const bool logFPS)
 	{
 		// Update SDL related input
 		inputState.mouseState = SDL_GetMouseState(&inputState.mousePosX, &inputState.mousePosY);
-		inputState.keyboardState = SDL_GetKeyboardState(NULL);
+		inputState.keyboardState = SDL_GetKeyboardState(nullptr);
 		if (!inputState.scrolledThisFrame)
 			UpdateMouseScroll(0.f);
 		else
 			inputState.scrolledThisFrame = false;
 
 		// Update ImGui related input
-		auto io = ImGui::GetIO();
+		const auto io = ImGui::GetIO();
 		inputState.hoveringOverUI = io.WantCaptureMouse;
 		if (logFPS) SDL_Log("%f", io.Framerate);
 	}
 
-	void UpdateMouseScroll(float amount)
+	void UpdateMouseScroll(const float amount)
 	{
 		if (abs(amount) < MIN_SCROLL)
 		{
@@ -62,7 +62,7 @@ namespace Terraria
 		}
 	}
 
-	bool Terraria::GetMouseButtonDown(MouseButton button, bool checkAgainstUI)
+	bool GetMouseButtonDown(const MouseButton button, const bool checkAgainstUI)
 	{
 		if (checkAgainstUI && inputState.hoveringOverUI) return false;
 		
@@ -83,7 +83,7 @@ namespace Terraria
 		return inputState.mouseState & mouseButtonMask;
 	}
 
-	bool GetMouseScroll(MouseScroll direction)
+	bool GetMouseScroll(const MouseScroll direction)
 	{
 		switch (direction)
 		{
@@ -99,7 +99,7 @@ namespace Terraria
 		}
 	}
 
-	bool GetKeyDown(int key)
+	bool GetKeyDown(const int key)
 	{
 		if (inputState.keyboardState == nullptr) return false;
 		return inputState.keyboardState[key];
@@ -110,5 +110,4 @@ namespace Terraria
 		x = inputState.mousePosX;
 		y = inputState.mousePosY;
 	}
-
 }

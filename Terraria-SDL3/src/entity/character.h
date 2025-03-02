@@ -1,6 +1,5 @@
 #pragma once
 
-#include "terraria.h"
 #include "SDL3/SDL_surface.h"
 
 struct SDL_Texture;
@@ -27,6 +26,5 @@ namespace Terraria
 	};
 
 	void UpdateCharacter(Character& character, float deltaTime, World& world);
-	void RenderCharacter(CharacterSprite& characterSprite, SDL_Renderer* renderer);
-
+	void RenderCharacter(const CharacterSprite& characterSprite, SDL_Renderer* renderer);
 }

@@ -10,11 +10,11 @@
 #define  SDL_MAIN_USE_CALLBACKS
 #include "SDL3/SDL_main.h"
 
-const uint32_t SCREEN_WIDTH = 1920;
-const uint32_t SCREEN_HEIGHT = 1080;
-const bool     FULLSCREEN = false;
-const bool     LOG_FPS = false;
-const uint32_t CHARACTER_Y_OFFSET = 100;
+constexpr uint32_t SCREEN_WIDTH = 1920;
+constexpr uint32_t SCREEN_HEIGHT = 1080;
+constexpr bool     FULLSCREEN = false;
+constexpr bool     LOG_FPS = false;
+constexpr uint32_t CHARACTER_Y_OFFSET = 100;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -59,6 +59,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
     return SDL_AppResult::SDL_APP_CONTINUE;
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
     ImGui_ImplSDL3_ProcessEvent(event);
@@ -132,14 +133,13 @@ void InitializeCharacter(Character& character)
     int screenWidth = 0;
     int screenHeight = 0;
     SDL_GetRenderOutputSize(renderer, &screenWidth, &screenHeight);
-    auto texture = Resource::LoadTexture("character", renderer);
-    character.sprite.posX = (screenWidth * 0.5f) - (character.sprite.width * 0.5f);
-    character.sprite.posY = (screenHeight * 0.5f) - (character.sprite.height * 0.5f) + CHARACTER_Y_OFFSET;
+    character.sprite.posX = (static_cast<float>(screenWidth) * 0.5f) - (character.sprite.width * 0.5f);
+    character.sprite.posY = (static_cast<float>(screenHeight) * 0.5f) - (character.sprite.height * 0.5f) + CHARACTER_Y_OFFSET;
 }
 
 void CalculateDeltaTime(float& dt)
 {
-    float timeThisFrame = (float)SDL_GetTicks();
+    const auto timeThisFrame = static_cast<float>(SDL_GetTicks());
     dt = (timeThisFrame - timeLastFrame) * 0.01f;
     timeLastFrame = timeThisFrame;
 }

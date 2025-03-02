@@ -1,5 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
+set (CMAKE_CXX_STANDARD 17)
+
 project(Terraria)
 
 add_executable(Terraria src/main.cpp
@@ -36,12 +38,12 @@ add_executable(Terraria src/main.cpp
  "vendor/includes/ImGui/imstb_truetype.h"
 )
 
+find_library(SDL3 SDL3 vendor/libraries/SDL3)
+find_library(SDL3_IMAGE SDL3_image vendor/libraries/SDL3)
 target_link_libraries(Terraria
-    PRIVATE 
-        #SDL3
-        #SDL3_image
-        ../../../vendor/libraries/SDL3/SDL3
-        ../../../vendor/libraries/SDL3/SDL3_image
+    PRIVATE
+        ${SDL3}
+        ${SDL3_IMAGE}
 )
 
 target_include_directories(Terraria

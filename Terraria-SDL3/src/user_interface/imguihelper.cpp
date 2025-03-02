@@ -1,8 +1,10 @@
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_sdlrenderer3.h"
 #include "imguihelper.h"
 
 #include "SDL3/SDL.h"
 
-static const char* FONT_PATH = "../../../res/fonts/default.ttf";
+static auto FONT_PATH = "../../../res/fonts/default.ttf";
 
 namespace Terraria
 {

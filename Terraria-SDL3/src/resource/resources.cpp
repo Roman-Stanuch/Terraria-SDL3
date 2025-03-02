@@ -2,10 +2,11 @@
 
 #include "SDL3/SDL_image.h"
 
+#include <unordered_map>
 #include <fstream>
 #include <sstream>
 
-static const char* TEXTURE_PACK_PATH = "../../../res/texture_packs/";
+static auto TEXTURE_PACK_PATH = "../../../res/texture_packs/";
 
 namespace Terraria
 {
@@ -16,7 +17,7 @@ namespace Terraria
 	{
 		std::string texturePackRoot = TEXTURE_PACK_PATH + name + "/";
 		std::string configPath = texturePackRoot + "config.txt";
-		if (std::ifstream configFile = std::ifstream(configPath))
+		if (auto configFile = std::ifstream(configPath))
 		{
 			std::string rowData;
 			while (std::getline(configFile, rowData))
@@ -58,9 +59,9 @@ namespace Terraria
 
 	void Resource::ClearResources()
 	{
-		for (auto& row : textureMap)
+		for (auto& [name, texture] : textureMap)
 		{
-			SDL_DestroyTexture(row.second);
+			SDL_DestroyTexture(texture);
 		}
 		textureMap.clear();
 	}
