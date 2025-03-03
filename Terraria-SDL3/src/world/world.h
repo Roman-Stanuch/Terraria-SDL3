@@ -12,13 +12,13 @@ namespace Terraria
 {
 	struct World
 	{
+		std::vector<uint32_t> tileData = {}; // Data loaded from the world file. Contains tile IDs.
+
 		uint32_t width = 0; // Width of world in tiles
 		uint32_t height = 0; // Height of world in tiles
 		const uint32_t tileWidth = 32; // Width of one tile in pixels
 		const uint32_t tileHeight = 32; // Height of one tile in pixels
 		const uint32_t overdrawAmount = 2; // How many extra tiles are drawn beyond the edge of the viewing area
-
-		std::vector<uint32_t> tileData = {};
 	};
 
 	// Attempts to load a world file into outWorld.

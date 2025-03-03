@@ -9,6 +9,9 @@ static constexpr float MIN_SCROLL = 0.01f;
 
 static struct InputState
 {
+	// Keyboard input
+	const bool* keyboardState = nullptr;
+
 	// Mouse Input
 	float mousePosX = 0.f;
 	float mousePosY = 0.f;
@@ -17,9 +20,6 @@ static struct InputState
 	bool scrollingUp = false;
 	bool scrollingDown = false;
 	bool hoveringOverUI = false;
-
-	// Keyboard input
-	const bool* keyboardState = nullptr;
 } inputState;
 
 namespace Terraria

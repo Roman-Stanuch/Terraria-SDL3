@@ -1,15 +1,17 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Terraria
 {
-	enum MouseButton
+	enum MouseButton : uint8_t
 	{
 		MouseButtonLeft = 0,
 		MouseButtonRight = 1,
 		MouseButtonMiddle = 2
 	};
 
-	enum MouseScroll
+	enum MouseScroll : uint8_t
 	{
 		MouseScrollUp = 0,
 		MouseScrollDown = 1
