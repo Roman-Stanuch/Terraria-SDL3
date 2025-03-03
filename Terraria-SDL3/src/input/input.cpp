@@ -7,30 +7,15 @@
 
 static constexpr float MIN_SCROLL = 0.01f;
 
-static struct InputState
-{
-	// Keyboard input
-	const bool* keyboardState = nullptr;
-
-	// Mouse Input
-	float mousePosX = 0.f;
-	float mousePosY = 0.f;
-	SDL_MouseButtonFlags mouseState = 0;
-	bool scrolledThisFrame = false;
-	bool scrollingUp = false;
-	bool scrollingDown = false;
-	bool hoveringOverUI = false;
-} inputState;
-
 namespace Terraria
 {
-	void PollInput(const bool logFPS)
+	void PollInput(InputState& inputState, const bool logFPS)
 	{
 		// Update SDL related input
 		inputState.mouseState = SDL_GetMouseState(&inputState.mousePosX, &inputState.mousePosY);
 		inputState.keyboardState = SDL_GetKeyboardState(nullptr);
 		if (!inputState.scrolledThisFrame)
-			UpdateMouseScroll(0.f);
+			UpdateMouseScroll(inputState, 0.f);
 		else
 			inputState.scrolledThisFrame = false;
 
@@ -40,7 +25,7 @@ namespace Terraria
 		if (logFPS) SDL_Log("%f", io.Framerate);
 	}
 
-	void UpdateMouseScroll(const float amount)
+	void UpdateMouseScroll(InputState& inputState, const float amount)
 	{
 		if (abs(amount) < MIN_SCROLL)
 		{
@@ -62,7 +47,7 @@ namespace Terraria
 		}
 	}
 
-	bool GetMouseButtonDown(const MouseButton button, const bool checkAgainstUI)
+	bool GetMouseButtonDown(const InputState& inputState, const MouseButton button, const bool checkAgainstUI)
 	{
 		if (checkAgainstUI && inputState.hoveringOverUI) return false;
 		
@@ -83,7 +68,7 @@ namespace Terraria
 		return inputState.mouseState & mouseButtonMask;
 	}
 
-	bool GetMouseScroll(const MouseScroll direction)
+	bool GetMouseScroll(const InputState& inputState, const MouseScroll direction)
 	{
 		switch (direction)
 		{
@@ -99,13 +84,13 @@ namespace Terraria
 		}
 	}
 
-	bool GetKeyDown(const int key)
+	bool GetKeyDown(const InputState& inputState, const int key)
 	{
 		if (inputState.keyboardState == nullptr) return false;
 		return inputState.keyboardState[key];
 	}
 
-	void GetMousePosition(float& x, float& y)
+	void GetMousePosition(const InputState& inputState, float& x, float& y)
 	{
 		x = inputState.mousePosX;
 		y = inputState.mousePosY;

@@ -7,6 +7,7 @@ struct SDL_Renderer;
 
 namespace Terraria
 {
+	struct InputState;
 	struct World;
 
 	struct CharacterSprite
@@ -25,6 +26,6 @@ namespace Terraria
 		float posY = 0.f;
 	};
 
-	void UpdateCharacter(Character& character, float deltaTime, World& world);
+	void HandleCharacterInput(const InputState& inputState, Character& character, World& world, float deltaTime);
 	void RenderCharacter(const CharacterSprite& characterSprite, SDL_Renderer* renderer);
 }

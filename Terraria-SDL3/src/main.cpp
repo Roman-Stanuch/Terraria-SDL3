@@ -20,6 +20,7 @@ SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 Terraria::World currentWorld;
 Terraria::Character character;
+Terraria::InputState inputState;
 
 float deltaTime = 0.f;
 float timeLastFrame = 0.f;
@@ -70,7 +71,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     }
     else if (event->type == SDL_EVENT_MOUSE_WHEEL)
     {
-        UpdateMouseScroll(event->wheel.y);
+        UpdateMouseScroll(inputState, event->wheel.y);
     }
 
     return SDL_APP_CONTINUE;
@@ -79,19 +80,19 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
     // Update input
-    PollInput(LOG_FPS);
+    PollInput(inputState, LOG_FPS);
 
     // Update world
     CalculateDeltaTime(deltaTime);
-    UpdateCharacter(character, deltaTime, currentWorld);
+    HandleCharacterInput(inputState, character, currentWorld, deltaTime);
 
     // Temporary scrolling test
-    if (GetMouseScroll(MouseScrollUp))
+    if (GetMouseScroll(inputState, MouseScrollUp))
     {
         highlightedTool--;
         if (highlightedTool < 0) highlightedTool = 9;
     }
-    else if (GetMouseScroll(MouseScrollDown))
+    else if (GetMouseScroll(inputState, MouseScrollDown))
     {
         highlightedTool++;
         if (highlightedTool > 9) highlightedTool = 0;
