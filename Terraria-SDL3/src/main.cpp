@@ -29,7 +29,7 @@ bool showToolbar = true;
 int highlightedTool = 0;
 
 void InitializeCharacter(Terraria::Character& character);
-void CalculateDeltaTime(float& dt);
+void CalculateDeltaTime(float& dt, float& lastFrameTime);
 
 using namespace Terraria;
 
@@ -83,8 +83,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     PollInput(inputState, LOG_FPS);
 
     // Update world
-    CalculateDeltaTime(deltaTime);
-    HandleCharacterInput(inputState, character, currentWorld, deltaTime);
+    CalculateDeltaTime(deltaTime, timeLastFrame);
+    HandleCharacterInput(character, inputState, currentWorld, deltaTime);
 
     // Temporary scrolling test
     if (GetMouseScroll(inputState, MouseScrollUp))
@@ -138,9 +138,9 @@ void InitializeCharacter(Character& character)
     character.sprite.posY = (static_cast<float>(screenHeight) * 0.5f) - (character.sprite.height * 0.5f) + CHARACTER_Y_OFFSET;
 }
 
-void CalculateDeltaTime(float& dt)
+void CalculateDeltaTime(float& dt, float& lastFrameTime)
 {
     const auto timeThisFrame = static_cast<float>(SDL_GetTicks());
-    dt = (timeThisFrame - timeLastFrame) * 0.01f;
-    timeLastFrame = timeThisFrame;
+    dt = (timeThisFrame - lastFrameTime) * 0.01f;
+    lastFrameTime = timeThisFrame;
 }

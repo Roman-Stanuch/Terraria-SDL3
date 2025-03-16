@@ -11,7 +11,7 @@ static auto SPRITE_PATH = "character";
 
 namespace Terraria
 {
-	void HandleBlockPlacement(const InputState& inputState, const Character& character, World& world);
+	void HandleBlockPlacement(const Character& character, const InputState& inputState, World& world);
 
 	void RenderCharacter(const CharacterSprite& characterSprite, SDL_Renderer* renderer)
 	{
@@ -20,7 +20,7 @@ namespace Terraria
 		SDL_RenderTextureRotated(renderer, texture, nullptr, &dstRect, 0.0, nullptr, characterSprite.direction);
 	}
 
-	void HandleCharacterInput(const InputState& inputState, Character& character, World& world, const float deltaTime)
+	void HandleCharacterInput(Character& character, const InputState& inputState, World& world, const float deltaTime)
 	{
 		if (GetKeyDown(inputState, SDL_SCANCODE_W))
 		{
@@ -41,16 +41,16 @@ namespace Terraria
 			character.sprite.direction = SDL_FLIP_HORIZONTAL;
 		}
 
-		HandleBlockPlacement(inputState, character, world);
+		HandleBlockPlacement(character, inputState, world);
 	}
 
-	void HandleBlockPlacement(const InputState& inputState, const Character& character, World& world)
+	void HandleBlockPlacement(const Character& character, const InputState& inputState, World& world)
 	{
 		float mousePosX = 0, mousePosY = 0;
 		GetMousePosition(inputState, mousePosX, mousePosY);
 		mousePosX += character.posX;
 		mousePosY += character.posY;
-		ScreenToTileCoordinates(mousePosX, mousePosY, world);
+		ScreenToTileCoordinates(mousePosX, mousePosY, static_cast<float>(world.tileWidth), static_cast<float>(world.tileHeight));
 		const auto mouseTilePosX = static_cast<uint32_t>(mousePosX);
 		const auto mouseTilePosY = static_cast<uint32_t>(mousePosY);
 
